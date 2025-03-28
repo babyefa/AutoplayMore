@@ -1,0 +1,61 @@
+let videoQueue = [];
+let currentIndex = 0;
+
+function searchVideos() {
+  const tags = document.getElementById("tagInput").value;
+  fetch(`https://e621.net/posts.json?tags=${encodeURIComponent(tags)}&limit=20`, {
+    headers: { 'User-Agent': 'AutoPlay/1.0 (by username on e621)' }
+  })
+    .then(res => res.json())
+    .then(data => {
+      videoQueue = data.posts.filter(p => p.file.ext === 'mp4').map(p => p.file.url);
+      currentIndex = 0;
+      playCurrent();
+      updateQueueList();
+    });
+}
+
+function queueVideoByURL() {
+  const urlInput = document.getElementById("urlInput").value;
+  const match = urlInput.match(/e621\.net\/posts\/(\d+)/);
+  if (!match) return alert("Invalid e621 post URL");
+
+  const postId = match[1];
+  fetch(`https://e621.net/posts/${postId}.json`, {
+    headers: { 'User-Agent': 'AutoPlay/1.0 (by username on e621)' }
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.post && data.post.file.ext === 'mp4') {
+        videoQueue.push(data.post.file.url);
+        updateQueueList();
+        if (videoQueue.length === 1) playCurrent();
+      } else {
+        alert("This post does not contain a video.");
+      }
+    });
+}
+
+function playCurrent() {
+  const video = document.getElementById("videoPlayer");
+  if (videoQueue[currentIndex]) {
+    video.src = videoQueue[currentIndex];
+    video.load();
+    video.play();
+  }
+}
+
+document.getElementById("videoPlayer").addEventListener("ended", () => {
+  currentIndex++;
+  if (currentIndex < videoQueue.length) playCurrent();
+});
+
+function updateQueueList() {
+  const list = document.getElementById("queueList");
+  list.innerHTML = "";
+  videoQueue.forEach((url, i) => {
+    const li = document.createElement("li");
+    li.textContent = `Video ${i + 1}`;
+    list.appendChild(li);
+  });
+}
