@@ -26,7 +26,7 @@ function queueVideoByURL() {
   if (!match) return alert("Invalid e621 post URL");
 
   const postId = match[1];
-  fetch(`http://localhost:3000/post/${postId}`)
+  fetch(`http://localhost:4000/post/${postId}`)
     .then(res => res.json())
     .then(data => {
       if (data.url) {
