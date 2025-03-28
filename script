@@ -1,15 +1,17 @@
-let videoQueue = [];
+let videoQueue = JSON.parse(localStorage.getItem("videoQueue") || "[]");
 let currentIndex = 0;
+let loopPlaylist = false;
 
 function searchVideos() {
   const tags = document.getElementById("tagInput").value;
   fetch(`https://e621.net/posts.json?tags=${encodeURIComponent(tags)}&limit=20`, {
-    headers: { 'User-Agent': 'AutoPlay/1.0 (by username on e621)' }
+    headers: { 'User-Agent': 'AutoPlay/1.0 (by babyefa on e621)' }
   })
     .then(res => res.json())
     .then(data => {
       videoQueue = data.posts.filter(p => p.file.ext === 'mp4').map(p => p.file.url);
       currentIndex = 0;
+      saveQueue();
       playCurrent();
       updateQueueList();
     });
@@ -22,12 +24,13 @@ function queueVideoByURL() {
 
   const postId = match[1];
   fetch(`https://e621.net/posts/${postId}.json`, {
-    headers: { 'User-Agent': 'AutoPlay/1.0 (by username on e621)' }
+    headers: { 'User-Agent': 'AutoPlay/1.0 (by babyefa on e621)' }
   })
     .then(res => res.json())
     .then(data => {
       if (data.post && data.post.file.ext === 'mp4') {
         videoQueue.push(data.post.file.url);
+        saveQueue();
         updateQueueList();
         if (videoQueue.length === 1) playCurrent();
       } else {
@@ -47,7 +50,12 @@ function playCurrent() {
 
 document.getElementById("videoPlayer").addEventListener("ended", () => {
   currentIndex++;
-  if (currentIndex < videoQueue.length) playCurrent();
+  if (currentIndex < videoQueue.length) {
+    playCurrent();
+  } else if (loopPlaylist) {
+    currentIndex = 0;
+    playCurrent();
+  }
 });
 
 function updateQueueList() {
@@ -56,6 +64,39 @@ function updateQueueList() {
   videoQueue.forEach((url, i) => {
     const li = document.createElement("li");
     li.textContent = `Video ${i + 1}`;
+    const removeBtn = document.createElement("button");
+    removeBtn.textContent = "Remove";
+    removeBtn.onclick = () => {
+      videoQueue.splice(i, 1);
+      if (i <= currentIndex && currentIndex > 0) currentIndex--;
+      saveQueue();
+      updateQueueList();
+    };
+    li.appendChild(removeBtn);
     list.appendChild(li);
   });
 }
+
+function shuffleQueue() {
+  for (let i = videoQueue.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [videoQueue[i], videoQueue[j]] = [videoQueue[j], videoQueue[i]];
+  }
+  currentIndex = 0;
+  saveQueue();
+  updateQueueList();
+}
+
+function toggleLoop() {
+  loopPlaylist = !loopPlaylist;
+  document.getElementById("loopButton").textContent = loopPlaylist ? "Loop: ON" : "Loop: OFF";
+}
+
+function saveQueue() {
+  localStorage.setItem("videoQueue", JSON.stringify(videoQueue));
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  updateQueueList();
+  if (videoQueue.length > 0) playCurrent();
+});
