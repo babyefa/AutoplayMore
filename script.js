@@ -40,7 +40,7 @@ function queueVideoByURL() {
     })
     .catch(err => {
       console.error(err);
-      alert("Failed to fetch video from proxy.");
+      alert("Trying to queue post ID: " + postId);
     });
 }
 
