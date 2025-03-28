@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>e621 AutoPlay+Queue</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>e621 AutoPlay</h1>
+  <div>
+    <input id="tagInput" placeholder="Enter tags (e.g. video order:random rating:s)" />
+    <button onclick="searchVideos()">Search & Play</button>
+  </div>
+
+  <div>
+    <input id="urlInput" placeholder="Paste e621 post URL to queue" />
+    <button onclick="queueVideoByURL()">Add to Queue</button>
+  </div>
+
+  <video id="videoPlayer" controls autoplay></video>
+
+  <p>Queue:</p>
+  <ul id="queueList"></ul>
+
+  <script src="script.js"></script>
+</body>
+</html>
