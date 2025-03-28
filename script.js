@@ -28,7 +28,7 @@ function queueVideoByURL() {
   })
     .then(res => res.json())
     .then(data => {
-      if (data.post && data.post.file.ext === 'mp4') {
+     if (data.post && (data.post.file.ext === 'mp4' || data.post.file.ext === 'webm')) {
         videoQueue.push(data.post.file.url);
         saveQueue();
         updateQueueList();
