@@ -22,26 +22,28 @@ function searchVideos() {
 
 function queueVideoByURL() {
   const urlInput = document.getElementById("urlInput").value;
-  const match = urlInput.match(/e621\.net\/posts\/(\d+)/);
+  const match = urlInput.match(/e621\\.net\\/posts\\/(\\d+)/);
   if (!match) return alert("Invalid e621 post URL");
 
   const postId = match[1];
-  fetch(`https://e621.net/posts/${postId}.json`, {
-    headers: { 'User-Agent': 'AutoPlay/1.0 (by babyefa on e621)' }
-  })
+  fetch(`http://localhost:3000/post/${postId}`)
     .then(res => res.json())
     .then(data => {
-     if (data.post && data.post.file && (data.post.file.ext === 'mp4' || data.post.file.ext === 'webm') && data.post.file.url) {
-        console.log('Queuing:', data.post.file.url); // optional log
-        videoQueue.push(data.post.file.url);
+      if (data.url) {
+        videoQueue.push(data.url);
         saveQueue();
         updateQueueList();
         if (videoQueue.length === 1) playCurrent();
       } else {
         alert("This post does not contain a video.");
       }
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Failed to fetch video from proxy.");
     });
 }
+
 
 function playCurrent() {
   const video = document.getElementById("videoPlayer");
