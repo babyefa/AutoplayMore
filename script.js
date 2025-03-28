@@ -9,7 +9,10 @@ function searchVideos() {
   })
     .then(res => res.json())
     .then(data => {
-      videoQueue = data.posts.filter(p => p.file.ext === 'mp4').map(p => p.file.url);
+      videoQueue = data.posts
+          .filter(p => ['mp4', 'webm'].includes(p.file.ext))
+          .map(p => p.file.url);
+
       currentIndex = 0;
       saveQueue();
       playCurrent();
