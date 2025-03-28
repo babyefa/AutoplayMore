@@ -12,9 +12,9 @@ app.get('/post/:id', async (req, res) => {
   console.log(`📥 Request received for post ID: ${postId}`);
 
   try {
-    const response = await axios.get(`https://e621.net/posts/${postId}.json`, {
+    const response = await axios.get(`https://www.youtube.com/watch?v=${postId}.json`, {
       headers: {
-        'User-Agent': 'AutoplayLocalProxy/1.0 (by babyefa on e621)'
+        'User-Agent': 'AutoplayLocalProxy/1.0 (by stealth987 on youtube)'
       }
     });
 
